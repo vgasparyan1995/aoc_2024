@@ -14,15 +14,14 @@ fn part1(input: &[(i32, i32)]) -> u32 {
 }
 
 fn part2(input: &[(i32, i32)]) -> i32 {
-    let freq =
-        input
-            .into_iter()
-            .map(|(_, id2)| id2)
-            .fold(HashMap::<i32, i32>::new(), |freq, &id| {
-                let mut freq = freq;
-                *freq.entry(id).or_insert(0) += 1;
-                freq
-            });
+    let freq = input
+        .into_iter()
+        .map(|(_, id2)| id2)
+        .fold(HashMap::new(), |freq, id| {
+            let mut freq = freq;
+            *freq.entry(id).or_insert(0) += 1;
+            freq
+        });
     input
         .into_iter()
         .map(|(id1, _)| id1)
