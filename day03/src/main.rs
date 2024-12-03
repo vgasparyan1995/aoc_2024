@@ -4,12 +4,19 @@ use std::io::{read_to_string, stdin};
 
 fn part1(input: &str) -> Result<i32> {
     let re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)")?;
-    Ok(re
+    let result = re
         .captures_iter(input)
         .map(|c| c.extract().1)
         .map(|[a, b]| (a.parse::<i32>().unwrap(), b.parse::<i32>().unwrap()))
         .map(|(a, b)| a * b)
-        .sum())
+        .sum();
+    Ok(result)
+}
+
+enum Cmd {
+    Do,
+    Dont,
+    Mul(i32),
 }
 
 enum Cmd {
