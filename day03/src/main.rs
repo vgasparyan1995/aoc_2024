@@ -19,12 +19,6 @@ enum Cmd {
     Mul(i32),
 }
 
-enum Cmd {
-    Do,
-    Dont,
-    Mul(i32),
-}
-
 fn part2(input: &str) -> Result<i32> {
     let re = Regex::new(r"mul\([0-9]+,[0-9]+\)|do\(\)|don't\(\)")?;
     let result = re
