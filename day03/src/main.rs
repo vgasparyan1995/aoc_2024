@@ -12,24 +12,35 @@ fn part1(input: &str) -> Result<i32> {
         .sum())
 }
 
+enum Cmd {
+    Do,
+    Dont,
+    Mul(i32),
+}
+
 fn part2(input: &str) -> Result<i32> {
-    let toggle_re = Regex::new(r"do\(\)|don't\(\)")?;
-    let toggles = toggle_re
+    let re = Regex::new(r"mul\([0-9]+,[0-9]+\)|do\(\)|don't\(\)")?;
+    let result = re
         .find_iter(input)
-        .map(|m| (m.start(), m.as_str() == "do()"))
-        .collect::<Vec<_>>();
-    let mul_re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)")?;
-    Ok(mul_re
-        .captures_iter(input)
-        .map(|c| (c.get(0).unwrap().start(), c.extract().1))
-        .map(|(idx, [a, b])| (idx, a.parse::<i32>().unwrap(), b.parse::<i32>().unwrap()))
-        .map(|(idx, a, b)| (idx, a * b))
-        .filter(|(m_idx, _)| {
-            let toggle_idx = toggles.partition_point(|(t_idx, _)| t_idx < m_idx);
-            toggle_idx == 0 || toggles[toggle_idx - 1].1
+        .map(|m| m.as_str())
+        .filter_map(|m| {
+            if m == "do()" {
+                return Some(Cmd::Do);
+            }
+            if m == "don't()" {
+                return Some(Cmd::Dont);
+            }
+            assert!(m.starts_with("mul("));
+            let (a, b) = m.strip_prefix("mul(")?.strip_suffix(")")?.split_once(",")?;
+            Some(Cmd::Mul(a.parse::<i32>().ok()? * b.parse::<i32>().ok()?))
         })
-        .map(|(_, val)| val)
-        .sum())
+        .fold((0, true), |(sum, enabled), cmd| match cmd {
+            Cmd::Do => (sum, true),
+            Cmd::Dont => (sum, false),
+            Cmd::Mul(n) => (if enabled { sum + n } else { sum }, enabled),
+        })
+        .0;
+    Ok(result)
 }
 
 fn main() -> Result<()> {
