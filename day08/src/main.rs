@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::ops::{Add, Sub};
+use std::ops::{Add, Mul, Sub};
 use std::{
     collections::{HashMap, HashSet},
     io::{stdin, BufRead},
@@ -29,6 +29,16 @@ impl Sub for Pos {
         Self {
             r: self.r - other.r,
             c: self.c - other.c,
+        }
+    }
+}
+
+impl Mul<i32> for Pos {
+    type Output = Self;
+    fn mul(self, s: i32) -> Self {
+        Self {
+            r: self.r * s,
+            c: self.c * s,
         }
     }
 }
@@ -92,32 +102,17 @@ fn part2(mtx: &Mtx) -> usize {
         })
         .into_iter()
         .map(|(_, positions)| {
+            let within_bounds =
+                |&p: &Pos| p.r >= 0 && p.r < r_max as i32 && p.c >= 0 && p.c < c_max as i32;
             positions
                 .iter()
                 .cartesian_product(positions.iter())
                 .filter(|(p1, p2)| p1 != p2)
-                .map(|(&p1, &p2)| {
-                    let d1 = p1 - p2;
-                    let d2 = p2 - p1;
-                    let mut a1 = p1;
-                    let mut a2 = p2;
-                    std::iter::from_fn(move || {
-                        let mut antinodes = Vec::new();
-                        if a1.r >= 0 && a1.r < r_max as i32 && a1.c >= 0 && a1.c < c_max as i32 {
-                            antinodes.push(a1);
-                        }
-                        if a2.r >= 0 && a2.r < r_max as i32 && a2.c >= 0 && a2.c < c_max as i32 {
-                            antinodes.push(a2);
-                        }
-                        a1 = a1 + d1;
-                        a2 = a2 + d2;
-                        if antinodes.is_empty() {
-                            None
-                        } else {
-                            Some(antinodes.into_iter())
-                        }
-                    })
-                    .flatten()
+                .map(|(p1, p2)| {
+                    (0..)
+                        .map(|n| *p1 + (*p1 - *p2) * n)
+                        .take_while(within_bounds)
+                        .chain((0..).map(|n| *p2 + (*p2 - *p1) * n).take_while(within_bounds))
                 })
                 .flatten()
                 .collect::<Vec<_>>()
