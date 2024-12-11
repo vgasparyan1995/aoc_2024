@@ -12,22 +12,19 @@ lazy_static! {
 }
 
 fn iterate(stone: Stone) -> HashMap<Stone, u64> {
-    let mut result = HashMap::new();
-    if stone == 0 {
-        result.insert(1, 1);
-        return result;
+    match stone {
+        0 => HashMap::from([(1, 1)]),
+        stone if stone.to_string().len() % 2 == 0 => {
+            let stone_str = stone.to_string();
+            let (s1, s2) = stone_str.split_at(stone_str.len() / 2);
+            let (s1, s2) = (s1.parse().unwrap(), s2.parse().unwrap());
+            let mut stones = HashMap::new();
+            *stones.entry(s1).or_default() += 1;
+            *stones.entry(s2).or_default() += 1;
+            stones
+        }
+        stone => HashMap::from([(stone * 2024, 1)]),
     }
-    let stone_str = stone.to_string();
-    if stone_str.len() % 2 == 0 {
-        let (s1, s2) = stone_str.split_at(stone_str.len() / 2);
-        let s1: Stone = s1.parse().unwrap();
-        let s2: Stone = s2.parse().unwrap();
-        *result.entry(s1).or_insert(0) += 1;
-        *result.entry(s2).or_insert(0) += 1;
-        return result;
-    }
-    result.insert(stone * 2024, 1);
-    result
 }
 
 fn num_stones(stones: &Vec<Stone>, num_blinks: u64) -> u64 {
