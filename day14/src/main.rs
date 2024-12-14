@@ -72,19 +72,18 @@ fn part2(input: &Vec<(Pos, Velocity)>, x_max: i32, y_max: i32) -> i32 {
                 .map(|&(p, v)| (p + v * n) % (x_max, y_max))
                 .collect::<HashSet<_>>();
             if robots.len() == input.len() {
-                for x in 0..x_max {
-                    for y in 0..y_max {
-                        print!(
-                            "{}",
-                            if robots.contains(&Pos { x, y }) {
+                (0..y_max).for_each(|y| {
+                    println!(
+                        "{}",
+                        (0..x_max)
+                            .map(|x| if robots.contains(&Pos { x, y }) {
                                 '*'
                             } else {
                                 '.'
-                            }
-                        );
-                    }
-                    println!("");
-                }
+                            })
+                            .collect::<String>()
+                    )
+                });
                 true
             } else {
                 false
