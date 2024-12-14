@@ -77,9 +77,9 @@ fn part2(input: &Vec<(Pos, Velocity)>, x_max: i32, y_max: i32) -> i32 {
                         "{}",
                         (0..x_max)
                             .map(|x| if robots.contains(&Pos { x, y }) {
-                                '*'
+                                '@'
                             } else {
-                                '.'
+                                '`'
                             })
                             .collect::<String>()
                     )
