@@ -109,6 +109,41 @@ fn part1(mtx: &Mtx, moves_saved: i32) -> usize {
     num_cheats
 }
 
+fn part2(mtx: &Mtx, moves_saved: usize) -> usize {
+    let start_pos = find(mtx, 'S');
+    let start_dir = DIRS
+        .into_iter()
+        .find(|&dir| get(mtx, start_pos + dir) == Some('.'))
+        .unwrap();
+    let path = std::iter::successors(Some((start_pos, start_dir)), |&(pos, dir)| {
+        [dir, dir.turn_left(), dir.turn_right()]
+            .into_iter()
+            .map(|dir| (pos + dir, dir))
+            .find(|&(next_pos, _)| get(mtx, next_pos) != Some('#'))
+    })
+    .map(|(pos, _)| pos)
+    .collect::<Vec<_>>();
+    (0..path.len())
+        .cartesian_product(0..path.len())
+        .filter(|&(i, j)| i < j)
+        .map(|(i, j)| {
+            let p1 = path[i];
+            let p2 = path[j];
+            let old_dist = j - i;
+            let new_dist = p1.r.abs_diff(p2.r) + p1.c.abs_diff(p2.c);
+            (path[i], path[j], old_dist as usize, new_dist as usize)
+        })
+        .filter_map(|(p1, p2, old_dist, new_dist)| {
+            if new_dist <= 20 && new_dist + moves_saved <= old_dist {
+                Some((p1, p2))
+            } else {
+                None
+            }
+        })
+        .unique()
+        .count()
+}
+
 fn main() {
     let input = stdin()
         .lock()
@@ -118,4 +153,5 @@ fn main() {
         .collect();
 
     println!("Part 1: {}", part1(&input, 100));
+    println!("Part 2: {}", part2(&input, 100));
 }
