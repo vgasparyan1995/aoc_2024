@@ -1,0 +1,1 @@
+The solution to part 2 is found by incremental tuning. The algorithm finds an error (unexpected gate configuration) and outputs that with some useful metadata to help fix the problem. The user then has to manually change the input, remember the change (swap of two gate outputs), and rerun again, until there are no errors.
